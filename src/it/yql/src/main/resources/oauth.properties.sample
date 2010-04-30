@@ -1,0 +1,6 @@
+# Created by Sumit Shah on 7/02/09.
+# Copyright (c) 2010 Yahoo! Inc. All rights reserved.
+#
+# The copyrights embodied in the content of this file are licensed under the BSD (revised) open source license.
+yos.consumerKey=<INSERT A REAL KEY HERE>
+yos.consumerSecret=<INSERT A REAL SECRET HERE>

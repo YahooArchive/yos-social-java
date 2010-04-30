@@ -1,0 +1,138 @@
+<!--
+// Created by Sumit Shah on 7/02/09.
+// Copyright (c) 2010 Yahoo! Inc. All rights reserved.
+//
+// The copyrights embodied in the content of this file are licensed under the BSD (revised) open source license.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.yahoo.yos.it</groupId>
+    <artifactId>yql</artifactId>
+    <packaging>war</packaging>
+    <version>0.1.0</version>
+    <properties>
+        <baseUrl>http://localhost:39999/</baseUrl>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.yahoo.yos</groupId>
+            <artifactId>sdk</artifactId>
+            <version>testing</version>
+        </dependency>
+        <dependency>
+            <!-- bsd/apache http://groovy.codehaus.org/faq.html#licence -->
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+        <dependency>
+            <!-- apache 2.0 http://groovy.codehaus.org/modules/http-builder/license.html -->
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+            <version>0.5.0-RC1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>yql</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo.groovy</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <version>1.0-beta-3</version>
+                <configuration>
+                    <source>
+                    import groovyx.net.http.HTTPBuilder
+                    import static groovyx.net.http.Method.GET
+                    import static groovyx.net.http.ContentType.XML
+                    import static groovyx.net.http.ContentType.TEXT
+
+                    def contains(tables, table) {
+                        def contains = false
+                        tables.table.each {
+                            if(table.equals(it.toString().trim())) {
+                                contains = true
+                            }
+                        }
+                        return contains
+                    }
+
+                    def http = new HTTPBuilder("${baseUrl}")
+                    http.request(GET, XML) {
+                        uri.path = '/yql.groovy'
+                        uri.query = [query:'show tables']
+                        println "test retrieving: " + uri
+                        response.success = { resp, query ->
+                            def success = true
+                            success &amp;= contains(query.results, "csv")
+                            //success &amp;= contains(query.results, "a")
+                            success &amp;= contains(query.results, "flickr.places")
+                            if(!success) {
+                                System.exit(1)
+                            } else {
+                                System.exit(0)
+                            }
+                        }
+                        response.failure = { resp ->
+                            failures.add("FAILURE: " + resp.statusLine + " " + url + "\n")
+                        }
+                    }
+                    </source>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- apache 2.0 http://www.eclipse.org/jetty/licenses.php -->
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.18</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <stopKey>yql</stopKey>
+                    <stopPort>49999</stopPort>
+                    <contextPath>/</contextPath>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>39999</port>
+                        </connector>
+                    </connectors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-jetty</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <scanIntervalSeconds>0</scanIntervalSeconds>
+                            <daemon>true</daemon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-jetty</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
