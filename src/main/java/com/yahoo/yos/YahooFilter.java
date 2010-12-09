@@ -345,16 +345,6 @@ public class YahooFilter implements Filter {
     }
 
     private void redirectForAuthorization(OAuthAccessor accessor, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        try {
-            // get the request token
-            List<OAuth.Parameter> callback = OAuth.newList(OAuth.OAUTH_CALLBACK, callbackUrl);
-            //client.getRequestToken(accessor, null, callback);
-            OAuthMessage message = client.getRequestTokenResponse(accessor, null, callback);
-        } catch (URISyntaxException ex) {
-            throw new ServletException(ex);
-        } catch (OAuthException ex) {
-            throw new ServletException(ex);
-        }
         if (accessor.requestToken != null) {
             try {
                 RequestToken rt = new RequestToken();
