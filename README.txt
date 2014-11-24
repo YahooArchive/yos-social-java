@@ -1,3 +1,6 @@
+
+*YOS Social Java SDK has been deprecated. If you have any concerns or questions, please don't hesitate to contact us in General Discussion at YDN forum: https://developer.yahoo.com/forums.*
+
 To obtain keys for your YOS application please visit:
 
 http://developer.yahoo.com/dashboard/
