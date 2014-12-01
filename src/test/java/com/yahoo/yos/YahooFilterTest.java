@@ -4,9 +4,6 @@
 // The copyrights embodied in the content of this file are licensed under the BSD (revised) open source license.
 package com.yahoo.yos;
 
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
